@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sudoku Game</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active">
+      <h1>Welcome to Sudoku!</h1>
+      <div class="button-container">
+        <button onclick="showScreen('matrix-screen')">Start Game</button>
+        <button onclick="showScreen('howtoplay-screen')">How to Play</button>
+      </div>
+    </div>
+
+    <!-- How to Play Screen -->
+    <div id="howtoplay-screen" class="screen">
+      <h2>How to Play</h2>
+      <p>
+        Select a difficulty level: Easy, Medium, or Hard. Based on your selection,
+        you will get a matrix with some blank spaces. Your task is to fill in
+        these blank spaces with numbers.
+      </p>
+      <div class="button-container">
+        <button onclick="showScreen('rules-screen')">Rules</button>
+        <button onclick="showScreen('start-screen')">Back to Start</button>
+      </div>
+    </div>
+
+    <!-- Rules Screen -->
+    <div id="rules-screen" class="screen">
+      <h2>Rules</h2>
+      <ul>
+        <li>Each row and column can contain each number only once.</li>
+        <li>The grid contains numbers from 1 to 9.</li>
+        <li>Some numbers are pre-filled (fixed), and your task is to fill the remaining blanks.</li>
+        <li>Complete the grid to solve the Sudoku puzzle!</li>
+      </ul>
+      <div class="button-container">
+        <button onclick="showScreen('howtoplay-screen')">Back to How to Play</button>
+        <button onclick="showScreen('start-screen')">Back to Start</button>
+      </div>
+    </div>
+
+    <!-- Difficulty Selection Screen -->
+    <div id="matrix-screen" class="screen">
+      <h2>Select Difficulty Level</h2>
+      <div class="button-container">
+        <button onclick="startGame('easy')">Easy</button>
+        <button onclick="startGame('medium')">Medium</button>
+        <button onclick="startGame('hard')">Hard</button>
+      </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="sudoku-screen" class="screen">
+      <div id="sudoku-grid" class="sudoku-grid"></div>
+      <button onclick="checkSudoku()">Submit</button>
+    </div>
+
+    <!-- Congratulations Screen -->
+    <div id="congrats-screen" class="screen">
+      <h2>Congratulations! You Solved the Puzzle!</h2>
+      <button onclick="location.reload()">Play Again</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
