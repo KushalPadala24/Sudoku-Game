@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudoku Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #000;
+      color: #00ff00;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 42rem;
+      padding: 2rem;
+    }
+
+    .screen {
+      text-align: center;
+      background-color: #111;
+      padding: 2rem;
+      border: 2px solid #00ff00;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      font-size: 1.875rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+    }
+
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    button {
+      width: 12rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #00ff00;
+      color: black;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    button:hover {
+      background-color: #33ff33;
+      transform: scale(1.1);
+    }
+
+    .sudoku-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 40px);
+      grid-gap: 5px;
+      justify-content: center;
+      margin-top: 20px;
+      border: 3px solid #00ff00;
+      padding: 3px;
+    }
+
+    .sudoku-cell {
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      font-size: 20px;
+      border: 1px solid #555;
+      background-color: #000;
+      color: #00ff00;
+      box-sizing: border-box;
+    }
+
+    /* Focused cell */
+    .sudoku-cell:focus {
+      border: 2px solid #00ff00;
+      outline: none;
+    }
+
+    /* Fixed cells (predefined numbers) */
+    .sudoku-cell[data-fixed="true"] {
+      background-color: #222;
+      font-weight: bold;
+      pointer-events: none; /* Ensures these cells are non-editable */
+    }
+
+    /* 3x3 Block Separation Styles */
+    .sudoku-cell:nth-child(3n+1) {
+      border-left: 3px solid #00ff00;
+    }
+
+    .sudoku-cell:nth-child(n+28):nth-child(-n+36),
+    .sudoku-cell:nth-child(n+55):nth-child(-n+63) {
+      border-top: 3px solid #00ff00;
+    }
+
+    .sudoku-cell:nth-child(27n),
+    .sudoku-cell:nth-child(9n) {
+      border-right: 3px solid #00ff00;
+    }
+
+    /* Media Queries for responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+
+      .sudoku-grid {
+        grid-template-columns: repeat(9, 35px);
+        grid-gap: 3px;
+      }
+
+      .sudoku-cell {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+      }
+
+      button {
+        width: 10rem;
+        font-size: 0.9rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .sudoku-grid {
+        grid-template-columns: repeat(9, 30px);
+        grid-gap: 3px;
+      }
+
+      .sudoku-cell {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+      }
+
+      button {
+        width: 8rem;
+        font-size: 0.85rem;
+      }
+
+      h1 {
+        font-size: 1.75rem;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active">
+      <h1>Welcome to Sudoku!</h1>
+      <div class="button-container">
+        <button onclick="showScreen('matrix-screen')">Start Game</button>
+        <button onclick="showScreen('howtoplay-screen')">How to Play</button>
+      </div>
+    </div>
+
+    <!-- How to Play Screen -->
+    <div id="howtoplay-screen" class="screen">
+      <h2>How to Play</h2>
+      <p>
+        Select a difficulty level: Easy, Medium, or Hard. Based on your selection,
+        you will get a matrix with some blank spaces. Your task is to fill in
+        these blank spaces with numbers.
+      </p>
+      <div class="button-container">
+        <button onclick="showScreen('rules-screen')">Rules</button>
+        <button onclick="showScreen('start-screen')">Back to Start</button>
+      </div>
+    </div>
+
+    <!-- Rules Screen -->
+    <div id="rules-screen" class="screen">
+      <h2>Rules</h2>
+      <ul>
+        <li>Each row and column can contain each number only once.</li>
+        <li>The grid contains numbers from 1 to 9.</li>
+        <li>Some numbers are pre-filled (fixed), and your task is to fill the remaining blanks.</li>
+        <li>Complete the grid to solve the Sudoku puzzle!</li>
+      </ul>
+      <div class="button-container">
+        <button onclick="showScreen('howtoplay-screen')">Back to How to Play</button>
+        <button onclick="showScreen('start-screen')">Back to Start</button>
+      </div>
+    </div>
+
+    <!-- Difficulty Selection Screen -->
+    <div id="matrix-screen" class="screen">
+      <h2>Select Difficulty Level</h2>
+      <div class="button-container">
+        <button onclick="startGame('easy')">Easy</button>
+        <button onclick="startGame('medium')">Medium</button>
+        <button onclick="startGame('hard')">Hard</button>
+      </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="sudoku-screen" class="screen">
+      <div id="sudoku-grid" class="sudoku-grid"></div>
+      <button onclick="checkSudoku()">Submit</button>
+    </div>
+
+    <!-- Congratulations Screen -->
+    <div id="congrats-screen" class="screen">
+      <h2>Congratulations! You Solved the Puzzle!</h2>
+      <button onclick="location.reload()">Play Again</button>
+    </div>
+  </div>
+
+  <script>
+    let currentGrid = [];
+    let solution = [];
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function generateValidSudoku() {
+      const grid = Array.from({ length: 9 }, () => Array(9).fill(0));
+
+      function isValid(grid, row, col, num) {
+        for (let x = 0; x < 9; x++) {
+          if (grid[row][x] === num || grid[x][col] === num) return false;
+        }
+        const startRow = Math.floor(row / 3) * 3;
+        const startCol = Math.floor(col / 3) * 3;
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            if (grid[startRow + i][startCol + j] === num) return false;
+          }
+        }
+        return true;
+      }
+
+      function solve(grid) {
+        for (let row = 0; row < 9; row++) {
+          for (let col = 0; col < 9; col++) {
+            if (grid[row][col] === 0) {
+              for (let num = 1; num <= 9; num++) {
+                if (isValid(grid, row, col, num)) {
+                  grid[row][col] = num;
+                  if (solve(grid)) return true;
+                  grid[row][col] = 0;
+                }
+              }
+              return false;
+            }
+          }
+        }
+        return true;
+      }
+
+      const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      for (let i = 0; i < 9; i++) {
+        const randomIndex = Math.floor(Math.random() * numbers.length);
+        grid[0][i] = numbers.splice(randomIndex, 1)[0];
+      }
+
+      solve(grid);
+      return grid;
+    }
+
+    function createPuzzle(difficulty) {
+      const solvedGrid = generateValidSudoku();
+      const puzzle = solvedGrid.map(row => [...row]);
+
+      const cellsToRemove =
+        difficulty === 'easy' ? 10 :
+        difficulty === 'medium' ? 20 :
+        30;
+
+      let removed = 0;
+      while (removed < cellsToRemove) {
+        const row = Math.floor(Math.random() * 9);
+        const col = Math.floor(Math.random() * 9);
+        if (puzzle[row][col] !== '') {
+          puzzle[row][col] = '';
+          removed++;
+        }
+      }
+
+      return { puzzle, solution: solvedGrid };
+    }
+
+    function startGame(difficulty) {
+      const { puzzle, solution: newSolution } = createPuzzle(difficulty);
+      currentGrid = puzzle;
+      solution = newSolution;
+
+      const gridElement = document.getElementById('sudoku-grid');
+      gridElement.innerHTML = '';
+
+      for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'sudoku-cell';
+          input.maxLength = 1;
+          input.dataset.row = i;
+          input.dataset.col = j;
+
+          if (puzzle[i][j] !== '') {
+            input.value = puzzle[i][j];
+            input.disabled = true;
+            input.setAttribute('data-fixed', 'true');
+          }
+
+          input.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (value === '' || /^[1-9]$/.test(value)) {
+              currentGrid[i][j] = value === '' ? '' : parseInt(value);
+            } else {
+              e.target.value = '';
+            }
+          });
+
+          gridElement.appendChild(input);
+        }
+      }
+
+      showScreen('sudoku-screen');
+    }
+
+    function checkSudoku() {
+      for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+          if (currentGrid[i][j] !== solution[i][j]) {
+            alert('Incorrect solution. Please try again!');
+            return;
+          }
+        }
+      }
+      showScreen('congrats-screen');
+    }
+  </script>
+</body>
+</html>
