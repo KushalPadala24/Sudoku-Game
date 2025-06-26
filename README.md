@@ -14,9 +14,13 @@ A retro-themed Sudoku puzzle game built using **pure HTML, CSS, and JavaScript**
 ## 🗂 Project Structure
 
 sudoku37/
+
 ├── README.md # Project overview and instructions
+
 ├── index.html # Main HTML layout
+
 ├── style.css # Styling and layout
+
 └── script.js # Game logic and puzzle generation
 
 
